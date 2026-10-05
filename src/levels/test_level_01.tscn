@@ -1,0 +1,15 @@
+[gd_scene format=3]
+
+[node name="TestLevel_01" type="Node2D"]
+
+[node name="Background" type="Node2D" parent="."]
+
+[node name="Tilemaps" type="Node2D" parent="."]
+
+[node name="Ground" type="TileMapLayer" parent="Tilemaps"]
+
+[node name="LevelObjects" type="Node2D" parent="."]
+
+[node name="Environment" type="Node" parent="."]
+
+[node name="CanvasModulate" type="CanvasModulate" parent="Environment"]

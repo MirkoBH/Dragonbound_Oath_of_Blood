@@ -13,11 +13,21 @@ config_version=5
 config/name="Dragonbound: Oath of Blood"
 config/features=PackedStringArray("4.7", "Forward Plus")
 config/icon="res://icon.svg"
+run/main_scene="res://src/core/main_game/main_game.tscn"
+
+[audio]
+
+buses/default_bus_layout="res://src/default_bus_layout.tres"
 
 [display]
 
-window/stretch/mode="canvas_items"
-window/stretch/aspect="expand"
+window/size/viewport_width=640
+window/size/viewport_height=360
+window/size/window_width_override=1280
+window/size/window_height_override=720
+window/stretch/mode="viewport"
+window/stretch/aspect="keep"
+window/stretch/scale_mode="integer"
 
 [physics]
 
@@ -25,8 +35,7 @@ window/stretch/aspect="expand"
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 rendering_device/driver.windows="d3d12"
-
-[audio]
-
-buses/default_bus_layout="res://src/default_bus_layout.tres"
+2d/snap/snap_2d_transforms_to_pixel=true
+2d/snap/snap_2d_vertices_to_pixel=true
