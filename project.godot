@@ -29,6 +29,20 @@ window/stretch/mode="viewport"
 window/stretch/aspect="keep"
 window/stretch/scale_mode="integer"
 
+[layer_names]
+
+2d_physics/layer_1="Terreno"
+2d_physics/layer_2="Plataformas atravesables"
+2d_physics/layer_3="Cuerpo de William"
+2d_physics/layer_4="Cuerpo de enemigos"
+2d_physics/layer_5="Recibe golpes: William"
+2d_physics/layer_6="Recibe golpes: enemigos"
+2d_physics/layer_7="Ataques de William"
+2d_physics/layer_8="Ataques enemigos"
+2d_physics/layer_9="Trampas"
+2d_physics/layer_10="Recolectables"
+2d_physics/layer_11="Interactuables"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
