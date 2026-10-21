@@ -21,6 +21,8 @@ func _ready() -> void:
 	await _probar_bloqueos()
 	await _probar_golpes()
 	await _probar_superposicion()
+	print("Tabla de perfiles (capa y máscara de cada tipo de objeto)")
+	print(CapasColision.describir())
 	print("Resultado: %s" % ("todo OK" if _fallas == 0 else "%d fallas" % _fallas))
 	get_tree().quit(0 if _fallas == 0 else 1)
 

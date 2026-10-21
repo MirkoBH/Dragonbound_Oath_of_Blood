@@ -121,3 +121,21 @@ static func mascara(perfil: Perfil) -> int:
 static func configurar(objeto: CollisionObject2D, perfil: Perfil) -> void:
 	objeto.collision_layer = capa(perfil)
 	objeto.collision_mask = mascara(perfil)
+
+
+## Nombres de las capas presentes en [param bits], separados por coma.
+static func nombres_de(bits: int) -> String:
+	var nombres := PackedStringArray()
+	for i in NOMBRES.size():
+		if bits & (1 << i):
+			nombres.append("%d %s" % [i + 1, NOMBRES[i]])
+	return ", ".join(nombres) if not nombres.is_empty() else "—"
+
+
+## Tabla legible con la capa y lo que detecta cada perfil.
+static func describir() -> String:
+	var lineas := PackedStringArray()
+	for perfil in Perfil.values():
+		lineas.append("%s\n    Capa:    %s\n    Detecta: %s" % [
+			Perfil.keys()[perfil], nombres_de(capa(perfil)), nombres_de(mascara(perfil))])
+	return "\n".join(lineas)
