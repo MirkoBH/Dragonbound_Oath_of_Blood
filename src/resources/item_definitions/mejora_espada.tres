@@ -1,0 +1,14 @@
+[gd_resource type="Resource" script_class="DefinicionObjeto" format=3]
+
+[ext_resource type="Script" path="res://src/resources/definicion_objeto.gd" id="1_ilos8"]
+
+[resource]
+script = ExtResource("1_ilos8")
+id = &"mejora_espada"
+nombre = "Mejora de espada"
+descripcion = "Afila tu espada: cada golpe inflige más daño."
+orden = 1
+tipo_compra = 0
+precios = PackedInt32Array(100, 150, 200)
+limite = 3
+valor_efecto = 0.5

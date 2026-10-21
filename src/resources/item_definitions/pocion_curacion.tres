@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DefinicionObjeto" format=3]
+
+[ext_resource type="Script" path="res://src/resources/definicion_objeto.gd" id="1_3d176"]
+
+[resource]
+script = ExtResource("1_3d176")
+id = &"pocion_curacion"
+nombre = "Poción de curación"
+descripcion = "Restaura la mitad de tu salud máxima."
+orden = 6
+categoria = 1
+tipo_compra = 2
+precios = PackedInt32Array(30)
+limite = 3
+tipo_efecto = 5
+valor_efecto = 0.5

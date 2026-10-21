@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DefinicionObjeto" format=3]
+
+[ext_resource type="Script" path="res://src/resources/definicion_objeto.gd" id="1_vl42g"]
+
+[resource]
+script = ExtResource("1_vl42g")
+id = &"talisman_magico"
+nombre = "Talismán de resistencia mágica"
+descripcion = "Reduce el daño de los ataques mágicos. Protege más contra los hechizos de los enemigos más fuertes que contra los de los más débiles."
+orden = 5
+precios = PackedInt32Array(250)
+tipo_efecto = 4
+valor_efecto = 0.25
