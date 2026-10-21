@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="DefinicionObjeto" format=3]
+
+[ext_resource type="Script" path="res://src/resources/definicion_objeto.gd" id="1_1nk8m"]
+
+[resource]
+script = ExtResource("1_1nk8m")
+id = &"mejora_armadura"
+nombre = "Mejora de armadura"
+descripcion = "Refuerza tu armadura: aumenta tu salud máxima en un corazón."
+orden = 3
+tipo_compra = 0
+precios = PackedInt32Array(100, 150, 200)
+limite = 3
+tipo_efecto = 2
+valor_efecto = 1.0

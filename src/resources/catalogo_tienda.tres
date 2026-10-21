@@ -1,0 +1,15 @@
+[gd_resource type="Resource" script_class="CatalogoTienda" format=3]
+
+[ext_resource type="Script" path="res://src/resources/definicion_objeto.gd" id="1_nqfjf"]
+[ext_resource type="Resource" path="res://src/resources/item_definitions/mejora_espada.tres" id="2_1o6yj"]
+[ext_resource type="Resource" path="res://src/resources/item_definitions/runa_fuego.tres" id="3_rv0l8"]
+[ext_resource type="Resource" path="res://src/resources/item_definitions/mejora_armadura.tres" id="4_vc4h8"]
+[ext_resource type="Resource" path="res://src/resources/item_definitions/talisman_fisico.tres" id="5_p2qgv"]
+[ext_resource type="Resource" path="res://src/resources/item_definitions/talisman_magico.tres" id="6_1ggq5"]
+[ext_resource type="Resource" path="res://src/resources/item_definitions/pocion_curacion.tres" id="7_y7qur"]
+[ext_resource type="Resource" path="res://src/resources/item_definitions/pocion_energia.tres" id="8_y5mqx"]
+[ext_resource type="Script" path="res://src/gameplay/shop/catalogo_tienda.gd" id="9_xd5t4"]
+
+[resource]
+script = ExtResource("9_xd5t4")
+objetos = Array[ExtResource("1_nqfjf")]([ExtResource("2_1o6yj"), ExtResource("3_rv0l8"), ExtResource("4_vc4h8"), ExtResource("5_p2qgv"), ExtResource("6_1ggq5"), ExtResource("7_y7qur"), ExtResource("8_y5mqx")])

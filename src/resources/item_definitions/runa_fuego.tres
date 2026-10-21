@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="DefinicionObjeto" format=3]
+
+[ext_resource type="Script" path="res://src/resources/definicion_objeto.gd" id="1_bk18v"]
+
+[resource]
+script = ExtResource("1_bk18v")
+id = &"runa_fuego"
+nombre = "Runa de fuego"
+descripcion = "Envuelve tu espada en fuego de dragón: cada golpe suma daño mágico, que atraviesa las defensas físicas de tus enemigos."
+orden = 2
+precios = PackedInt32Array(450)
+tipo_efecto = 1
+valor_efecto = 1.0

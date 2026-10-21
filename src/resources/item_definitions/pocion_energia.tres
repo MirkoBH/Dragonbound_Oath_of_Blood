@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="DefinicionObjeto" format=3]
+
+[ext_resource type="Script" path="res://src/resources/definicion_objeto.gd" id="1_be1m1"]
+
+[resource]
+script = ExtResource("1_be1m1")
+id = &"pocion_energia"
+nombre = "Poción de energía"
+descripcion = "Restaura la mitad de tu energía."
+orden = 7
+categoria = 1
+tipo_compra = 2
+precios = PackedInt32Array(30)
+limite = 3
+tipo_efecto = 6
+valor_efecto = 50.0
