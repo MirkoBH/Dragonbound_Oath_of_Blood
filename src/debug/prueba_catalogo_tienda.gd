@@ -1,8 +1,10 @@
-extends SceneTree
+extends Node
 ## Prueba del catálogo de la tienda (1.4.9.1).
 ##
-## Ejecutar desde la carpeta del proyecto:
-##   godot --headless -s res://src/debug/prueba_catalogo_tienda.gd
+## Desde el editor: abrir src/debug/prueba_catalogo_tienda.tscn y presionar F6.
+## El resultado aparece en el panel Salida.
+## Desde la terminal (carpeta del proyecto):
+##   godot --headless res://src/debug/prueba_catalogo_tienda.tscn
 ## Termina con código 0 si todas las verificaciones pasan.
 
 const RUTA_CATALOGO := "res://src/resources/catalogo_tienda.tres"
@@ -10,11 +12,11 @@ const RUTA_CATALOGO := "res://src/resources/catalogo_tienda.tres"
 var _fallas := 0
 
 
-func _init() -> void:
+func _ready() -> void:
 	var catalogo := load(RUTA_CATALOGO) as CatalogoTienda
 	_verificar(catalogo != null, "El catálogo se carga.")
 	if catalogo == null:
-		quit(1)
+		get_tree().quit(1)
 		return
 	var errores := catalogo.validar()
 	_verificar(errores.is_empty(), "El catálogo no tiene errores de datos. %s" % ", ".join(errores))
@@ -65,7 +67,7 @@ func _init() -> void:
 	_verificar(total == 1850, "El equipamiento completo cuesta 1.850 de oro (da %d)." % total)
 
 	print("Resultado: %s" % ("todo OK" if _fallas == 0 else "%d fallas" % _fallas))
-	quit(0 if _fallas == 0 else 1)
+	get_tree().quit(0 if _fallas == 0 else 1)
 
 
 func _verificar(condicion: bool, descripcion: String) -> void:
