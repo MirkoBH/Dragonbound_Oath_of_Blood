@@ -1,6 +1,46 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/player/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://src/core/state_machine/maquina_estados.gd" id="2_maquina"]
+[ext_resource type="Script" path="res://src/gameplay/player/estados/quieto.gd" id="3_quieto"]
+[ext_resource type="Script" path="res://src/gameplay/player/estados/correr.gd" id="4_correr"]
+[ext_resource type="Script" path="res://src/gameplay/player/estados/saltar.gd" id="5_saltar"]
+[ext_resource type="Script" path="res://src/gameplay/player/estados/caer.gd" id="6_caer"]
+[ext_resource type="Script" path="res://src/gameplay/player/estados/atacar.gd" id="7_atacar"]
+[ext_resource type="Script" path="res://src/gameplay/player/estados/recibir_danio.gd" id="8_danio"]
+[ext_resource type="Script" path="res://src/gameplay/player/estados/morir.gd" id="9_morir"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_caja"]
+size = Vector2(12, 28)
 
 [node name="Player" type="CharacterBody2D"]
 script = ExtResource("1_player")
+
+[node name="CajaColision" type="CollisionShape2D" parent="."]
+position = Vector2(0, -14)
+shape = SubResource("RectangleShape2D_caja")
+
+[node name="MaquinaEstados" type="Node" parent="." node_paths=PackedStringArray("estado_inicial")]
+script = ExtResource("2_maquina")
+estado_inicial = NodePath("Quieto")
+
+[node name="Quieto" type="Node" parent="MaquinaEstados"]
+script = ExtResource("3_quieto")
+
+[node name="Correr" type="Node" parent="MaquinaEstados"]
+script = ExtResource("4_correr")
+
+[node name="Saltar" type="Node" parent="MaquinaEstados"]
+script = ExtResource("5_saltar")
+
+[node name="Caer" type="Node" parent="MaquinaEstados"]
+script = ExtResource("6_caer")
+
+[node name="Atacar" type="Node" parent="MaquinaEstados"]
+script = ExtResource("7_atacar")
+
+[node name="RecibirDanio" type="Node" parent="MaquinaEstados"]
+script = ExtResource("8_danio")
+
+[node name="Morir" type="Node" parent="MaquinaEstados"]
+script = ExtResource("9_morir")
