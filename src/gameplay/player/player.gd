@@ -17,6 +17,9 @@ signal estado_cambiado(anterior: StringName, nuevo: StringName)
 signal golpe_activado
 ## Terminó la animación de muerte: la partida puede reiniciarse (1.4.11.3).
 signal muerte_terminada
+## William aceptó un golpe (ya aplicó el retroceso y la invulnerabilidad).
+## 1.4.5.1 lo usa para descontar la salud.
+signal golpe_recibido(golpe: Golpe)
 
 const TILE := 16.0
 
@@ -41,15 +44,31 @@ const TILE := 16.0
 @export var distancia_retroceso: float = 0.5 * TILE
 ## Duración de la animación de muerte: 15 frames a 12 cuadros/s.
 @export var duracion_muerte: float = 1.25
+## Invulnerabilidad después de recibir un golpe (1.2.4.2).
+@export var duracion_invulnerabilidad: float = 1.0
+## Tiempo que la hitbox de la espada queda activa desde el frame del golpe.
+@export var ventana_golpe: float = 0.1
+## Daño base de la espada, en corazones (1.2.4.2). Las mejoras las suma 1.4.5.2.
+@export var danio_espada: float = 1.0
 
 ## Lado hacia el que mira William: 1 derecha, -1 izquierda.
 var mirando: int = 1
 
 @onready var maquina: MaquinaEstados = $MaquinaEstados
+## Hitbox de la espada: 24 px (1,5 tiles) frente al cuerpo (1.2.5.1, 6.2).
+@onready var espada: Hitbox = $Espada
+## Área donde William recibe golpes: 12 × 28 px (1.2.5.1, 6.2).
+@onready var area_golpes: Hurtbox = $AreaGolpes
+
+var _desplazamiento_espada: float = 0.0
 
 
 func _ready() -> void:
 	CapasColision.configurar(self, CapasColision.Perfil.CUERPO_WILLIAM)
+	_desplazamiento_espada = absf(espada.position.x)
+	espada.danio = danio_espada
+	golpe_activado.connect(_activar_espada)
+	area_golpes.golpe_recibido.connect(_al_recibir_golpe)
 	maquina.estado_cambiado.connect(func(anterior: StringName, nuevo: StringName) -> void:
 		estado_cambiado.emit(anterior, nuevo))
 	maquina.iniciar(self)
@@ -89,6 +108,21 @@ func mover_horizontal(direccion: float) -> void:
 	velocity.x = direccion * velocidad_correr
 	if direccion != 0.0:
 		mirando = 1 if direccion > 0.0 else -1
+
+
+# --- Golpes ---
+
+## Activa la espada hacia donde mira William durante [member ventana_golpe].
+func _activar_espada() -> void:
+	espada.position.x = _desplazamiento_espada * mirando
+	espada.activar(ventana_golpe)
+
+
+## La hurtbox aceptó un golpe: retroceso e invulnerabilidad breve.
+func _al_recibir_golpe(golpe: Golpe) -> void:
+	if recibir_danio(golpe.origen.x):
+		area_golpes.aplicar_invulnerabilidad(duracion_invulnerabilidad)
+		golpe_recibido.emit(golpe)
 
 
 # --- Eventos externos ---

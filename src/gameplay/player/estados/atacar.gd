@@ -20,6 +20,12 @@ func entrar(_datos: Dictionary = {}) -> void:
 		jugador.velocity.x = 0.0
 
 
+## Si el ataque termina o se interrumpe (por ejemplo, por un golpe), la
+## espada deja de golpear.
+func salir() -> void:
+	jugador.espada.desactivar()
+
+
 func actualizar_fisica(delta: float) -> void:
 	_tiempo += delta
 	jugador.aplicar_gravedad(delta)
