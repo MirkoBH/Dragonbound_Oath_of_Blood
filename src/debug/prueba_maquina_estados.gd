@@ -46,11 +46,11 @@ func _ready() -> void:
 	_verificar(_jugador.obtener_estado() == &"Quieto" and _jugador.is_on_floor(), "Al tocar el piso vuelve a Quieto.")
 
 	print("Correr")
-	await _mantener(&"mover_derecha", 5)
+	await _mantener(&"mover_derecha", 12)
 	_verificar(_jugador.obtener_estado() == &"Correr" and _jugador.velocity.x > 0.0, "Con D corre a la derecha.")
 	_verificar(is_equal_approx(_jugador.velocity.x, 7.0 * Jugador.TILE), "Corre a 7 tiles/s (1.2.6.1).")
 	Input.action_release(&"mover_derecha")
-	await _esperar(2)
+	await _esperar(5)
 	_verificar(_jugador.obtener_estado() == &"Quieto" and _jugador.velocity.x == 0.0, "Al soltar vuelve a Quieto.")
 	await _mantener(&"mover_izquierda", 3)
 	Input.action_release(&"mover_izquierda")
@@ -59,7 +59,7 @@ func _ready() -> void:
 
 	print("Saltar")
 	var y_inicial := _jugador.position.y
-	await _tocar(&"saltar")
+	await _mantener(&"saltar", 2)
 	_verificar(_jugador.obtener_estado() == &"Saltar" and _jugador.velocity.y < 0.0, "Espacio en el suelo pasa a Saltar.")
 	var y_minima := y_inicial
 	var paso_por_caer := false
@@ -70,10 +70,12 @@ func _ready() -> void:
 			paso_por_caer = true
 		if paso_por_caer and _jugador.obtener_estado() == &"Quieto":
 			break
+	Input.action_release(&"saltar")
+	await _esperar(1)
 	_verificar(paso_por_caer, "Pasada la cima pasa a Caer.")
 	_verificar(_jugador.obtener_estado() == &"Quieto", "Al aterrizar vuelve a Quieto.")
 	var altura := (y_inicial - y_minima) / Jugador.TILE
-	_verificar(absf(altura - 3.5) < 0.25, "El salto llega a unos 3,5 tiles (da %.2f)." % altura)
+	_verificar(absf(altura - 3.5) < 0.25, "Manteniendo Espacio, el salto llega a unos 3,5 tiles (da %.2f)." % altura)
 
 	print("Atacar en el suelo")
 	_golpes = 0

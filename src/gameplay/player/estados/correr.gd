@@ -1,5 +1,5 @@
 extends EstadoJugador
-## William corre en el suelo.
+## William corre en el suelo, con aceleración y frenado (1.4.3.2).
 
 
 func _init() -> void:
@@ -14,4 +14,4 @@ func actualizar_fisica(delta: float) -> void:
 	if direccion == 0.0:
 		cambiar_a(&"Quieto")
 		return
-	jugador.mover_horizontal(direccion)
+	jugador.mover_horizontal(direccion, delta)

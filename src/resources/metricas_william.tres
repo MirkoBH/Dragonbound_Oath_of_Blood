@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="MetricasJugador" format=3]
+
+[ext_resource type="Script" path="res://src/resources/metricas_jugador.gd" id="1_8xq4j"]
+
+[resource]
+script = ExtResource("1_8xq4j")
+velocidad_correr = 7.0
+tiempo_aceleracion = 0.1
+tiempo_frenado = 0.05
+control_aereo = 1.0
+altura_salto_max = 3.5
+altura_salto_min = 1.5
+distancia_salto_max = 5.0
+velocidad_max_caida = 15.0
+margen_borde = 0.1
+memoria_salto = 0.1

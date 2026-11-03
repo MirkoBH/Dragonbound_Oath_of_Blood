@@ -6,8 +6,9 @@ extends CharacterBody2D
 ## Morir · RecibirDanio · Atacar · Saltar / Caer · Correr · Quieto.
 ## Las habilidades dracónicas (1.4.5) se agregan como estados nuevos.
 ##
-## El movimiento de este script es provisional: usa las métricas de 1.2.6.1
-## sin aceleración ni salto variable. Lo reemplaza y lo calibra 1.4.3.2.
+## Movimiento (1.4.3.2): aceleración y frenado, control en el aire, salto de
+## altura variable, gravedad simétrica, margen al borde y memoria del salto.
+## Los valores están en [member metricas] (src/resources/metricas_william.tres).
 ## Las animaciones de cada estado se conectan en 1.4.10.
 
 ## Cambio de estado, para la animación (1.4.10) y la depuración.
@@ -23,15 +24,8 @@ signal golpe_recibido(golpe: Golpe)
 
 const TILE := 16.0
 
-@export_group("Movimiento provisional (1.2.6.1)")
-## Velocidad al correr: 7 tiles/s.
-@export var velocidad_correr: float = 7.0 * TILE
-## Altura del salto: 3.5 tiles.
-@export var altura_salto: float = 3.5 * TILE
-## Tiempo desde el despegue hasta la parte más alta del salto.
-@export var tiempo_hasta_cima: float = 0.4
-## Velocidad máxima de caída: 15 tiles/s.
-@export var velocidad_max_caida: float = 15.0 * TILE
+## Métricas de movimiento (1.2.6.1). Se calibran editando el .tres.
+@export var metricas: MetricasJugador = preload("res://src/resources/metricas_william.tres")
 
 @export_group("Combate (1.2.4.2 y 1.2.5.1)")
 ## Duración del ataque: 8 frames a 20 cuadros/s.
@@ -61,6 +55,14 @@ var mirando: int = 1
 @onready var area_golpes: Hurtbox = $AreaGolpes
 
 var _desplazamiento_espada: float = 0.0
+## Segundos desde que se presionó Espacio (memoria del salto).
+var _tiempo_desde_pedido_salto: float = INF
+## Segundos desde la última vez que William tocó el suelo (margen al borde).
+var _tiempo_desde_suelo: float = 0.0
+## Si todavía puede usar el margen al borde: se pierde al saltar.
+var _margen_disponible: bool = true
+## Altura (posición y) desde la que despegó el último salto.
+var y_despegue: float = 0.0
 
 
 func _ready() -> void:
@@ -75,20 +77,29 @@ func _ready() -> void:
 
 
 func _physics_process(delta: float) -> void:
+	if Input.is_action_just_pressed(&"saltar"):
+		_tiempo_desde_pedido_salto = 0.0
+	else:
+		_tiempo_desde_pedido_salto += delta
 	maquina.actualizar_fisica(delta)
 	move_and_slide()
+	if is_on_floor():
+		_tiempo_desde_suelo = 0.0
+		_margen_disponible = true
+	else:
+		_tiempo_desde_suelo += delta
 
 
 # --- Valores derivados ---
 
-## Gravedad que produce un salto de [member altura_salto] en [member tiempo_hasta_cima].
+## Gravedad, en px/s² (igual al subir y al bajar).
 func obtener_gravedad() -> float:
-	return 2.0 * altura_salto / (tiempo_hasta_cima * tiempo_hasta_cima)
+	return metricas.obtener_gravedad()
 
 
-## Velocidad inicial del salto.
+## Velocidad inicial del salto máximo, en px/s.
 func obtener_velocidad_salto() -> float:
-	return 2.0 * altura_salto / tiempo_hasta_cima
+	return metricas.obtener_velocidad_salto()
 
 
 # --- Ayudas para los estados ---
@@ -100,14 +111,63 @@ func obtener_direccion() -> float:
 
 ## Aplica la gravedad, con tope en la velocidad máxima de caída.
 func aplicar_gravedad(delta: float) -> void:
-	velocity.y = minf(velocity.y + obtener_gravedad() * delta, velocidad_max_caida)
+	velocity.y = minf(velocity.y + obtener_gravedad() * delta, metricas.obtener_velocidad_max_caida())
 
 
-## Mueve en horizontal según [param direccion] y actualiza hacia dónde mira.
-func mover_horizontal(direccion: float) -> void:
-	velocity.x = direccion * velocidad_correr
+## Acelera o frena en horizontal hacia [param direccion] y actualiza hacia
+## dónde mira. Frena más rápido de lo que acelera, también al dar la vuelta.
+## En el aire se aplica el control aéreo de las métricas.
+func mover_horizontal(direccion: float, delta: float) -> void:
+	var objetivo := direccion * metricas.obtener_velocidad()
+	var cambio: float
+	if direccion == 0.0 or (velocity.x != 0.0 and signf(direccion) != signf(velocity.x)):
+		cambio = metricas.obtener_frenado()
+	else:
+		cambio = metricas.obtener_aceleracion()
+	if not is_on_floor():
+		cambio *= metricas.control_aereo
+	velocity.x = move_toward(velocity.x, objetivo, cambio * delta)
 	if direccion != 0.0:
 		mirando = 1 if direccion > 0.0 else -1
+
+
+## Velocidad hacia arriba (positiva) para subir [param altura] px más.
+## Resta medio cuadro de gravedad: los estados aplican la gravedad antes de
+## moverse, y sin esta corrección cada salto subiría unos 2,6 px de más.
+func calcular_velocidad_para_subir(altura: float) -> float:
+	if altura <= 0.0:
+		return 0.0
+	var paso := 1.0 / Engine.physics_ticks_per_second
+	return maxf(sqrt(2.0 * obtener_gravedad() * altura) - obtener_gravedad() * paso / 2.0, 0.0)
+
+
+## Despega: impulso para el salto máximo. Guarda la altura de despegue para
+## el salto variable y consume el pedido de salto y el margen al borde.
+func impulsar_salto() -> void:
+	velocity.y = -calcular_velocidad_para_subir(metricas.altura_salto_max * TILE)
+	y_despegue = position.y
+	_tiempo_desde_pedido_salto = INF
+	_margen_disponible = false
+
+
+## Salto variable: al soltar Espacio, limita lo que le queda por subir para
+## que el salto total sea como mínimo la altura del toque (1,5 tiles). Si ya
+## pasó esa altura, deja de subir ahí mismo.
+func cortar_salto() -> void:
+	var subido := y_despegue - position.y
+	var restante := metricas.altura_salto_min * TILE - subido
+	velocity.y = maxf(velocity.y, -calcular_velocidad_para_subir(restante))
+
+
+## Indica si hay un salto pedido dentro de la memoria del salto.
+func hay_salto_pedido() -> bool:
+	return _tiempo_desde_pedido_salto <= metricas.memoria_salto
+
+
+## Indica si William puede saltar en el aire por el margen al borde: dejó el
+## suelo caminando hace menos de [member MetricasJugador.margen_borde].
+func puede_saltar_por_margen() -> bool:
+	return _margen_disponible and _tiempo_desde_suelo <= metricas.margen_borde
 
 
 # --- Golpes ---
