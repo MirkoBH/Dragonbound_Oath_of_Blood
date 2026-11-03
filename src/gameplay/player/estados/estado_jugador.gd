@@ -22,12 +22,12 @@ func volver_segun_situacion() -> void:
 
 
 ## Revisa las acciones que se pueden iniciar en el suelo. Devuelve true si
-## cambió de estado.
+## cambió de estado. El salto usa la memoria del salto (1.2.3.3).
 func revisar_acciones_en_suelo() -> bool:
 	if not jugador.is_on_floor():
 		cambiar_a(&"Caer")
 		return true
-	if Input.is_action_just_pressed(&"saltar"):
+	if jugador.hay_salto_pedido():
 		cambiar_a(&"Saltar")
 		return true
 	if Input.is_action_just_pressed(&"atacar"):
