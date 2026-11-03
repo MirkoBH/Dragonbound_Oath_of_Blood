@@ -16,6 +16,8 @@ func entrar(_datos: Dictionary = {}) -> void:
 	_tiempo = 0.0
 	_terminada = false
 	jugador.velocity.x = 0.0
+	jugador.area_golpes.activa = false
+	jugador.espada.desactivar()
 
 
 func actualizar_fisica(delta: float) -> void:
