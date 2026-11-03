@@ -96,6 +96,10 @@ func _physics_process(delta: float) -> void:
 
 # --- Colisión con terreno y plataformas (1.4.3.3) ---
 
+## La caja de colisión (player.tscn) tiene las esquinas de abajo cortadas
+## 3 px, para que no se enganche en las uniones entre tiles al pasar de llano
+## a rampa ni en el borde de una plataforma.
+##
 ## Configura cómo William pisa el suelo: rampas de hasta 45° cuentan como
 ## suelo, se queda quieto sobre ellas sin resbalar y se pega al suelo al bajar.
 func _configurar_suelo() -> void:
@@ -151,7 +155,13 @@ func obtener_direccion() -> float:
 
 
 ## Aplica la gravedad, con tope en la velocidad máxima de caída.
+## Apoyado en el suelo no acumula velocidad hacia abajo: así no resbala
+## quieto en una rampa ni depende de redondeos de la física (1.4.3.3). El
+## pegado al suelo lo mantiene en contacto al bajar rampas.
 func aplicar_gravedad(delta: float) -> void:
+	if is_on_floor() and velocity.y >= 0.0:
+		velocity.y = 0.0
+		return
 	velocity.y = minf(velocity.y + obtener_gravedad() * delta, metricas.obtener_velocidad_max_caida())
 
 

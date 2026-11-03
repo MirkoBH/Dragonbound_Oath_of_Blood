@@ -149,13 +149,25 @@ func _ready() -> void:
 		_verificar(_jugador.velocity.y < 0.0 and not _jugador.is_on_floor(), "Puede saltar desde la rampa.")
 		await _esperar_suelo()
 
+	print("Uniones entre tiles con corrimientos de menos de 1 px")
+	# Los redondeos de la física cambian según la computadora: se repite el
+	# recorrido de las lomas con el terreno corrido fracciones de píxel.
+	var sin_trabarse := 0
+	var intentos := 0
+	for corrimiento in [Vector2(0.31, 0.17), Vector2(0.73, 0.59), Vector2(0.05, 0.91)]:
+		for de_45 in [true, false]:
+			intentos += 1
+			if await _recorrer_loma(de_45, corrimiento):
+				sin_trabarse += 1
+	_verificar(sin_trabarse == intentos, "Recorre las lomas de 45° y 22,5° sin trabarse en %d de %d intentos." % [sin_trabarse, intentos])
+
 	print("Resultado: %s" % ("todo OK" if _fallas == 0 else "%d fallas" % _fallas))
 	get_tree().quit(0 if _fallas == 0 else 1)
 
 
 ## Reemplaza el escenario: nuevo tilemap pintado por [param pintar] y William
 ## en [param posicion], ya apoyado en el suelo.
-func _armar(pintar: Callable, posicion: Vector2) -> void:
+func _armar(pintar: Callable, posicion: Vector2, corrimiento := Vector2.ZERO) -> void:
 	for accion in [&"mover_izquierda", &"mover_derecha", &"saltar", &"apuntar_abajo"]:
 		Input.action_release(accion)
 	if _capa:
@@ -164,13 +176,38 @@ func _armar(pintar: Callable, posicion: Vector2) -> void:
 		_jugador.queue_free()
 	await get_tree().physics_frame
 	_capa = EscenarioPrueba.crear_tilemap(self)
+	_capa.position = corrimiento
 	pintar.call(_capa)
 	_jugador = preload("res://src/gameplay/player/player.tscn").instantiate()
-	_jugador.position = posicion
+	_jugador.position = posicion + corrimiento
 	add_child(_jugador)
 	await _esperar(3)
 	await _esperar_suelo()
 	await _esperar(5)
+
+
+## Arma una loma de 4 tiles (45° o 22,5°) corrida [param corrimiento] px y la
+## recorre hacia la derecha. Devuelve true si sube y baja sin trabarse.
+func _recorrer_loma(de_45: bool, corrimiento: Vector2) -> bool:
+	var largo := 4 if de_45 else 8
+	await _armar(func(c: TileMapLayer) -> void:
+		EscenarioPrueba.pintar(c, Vector2i(-10, 0), Vector2i(60, 1))
+		EscenarioPrueba.pintar_rampa(c, Vector2i(5, -1), 4, de_45, 1)
+		EscenarioPrueba.pintar(c, Vector2i(5 + largo, -4), Vector2i(5 + largo + 5, -1))
+		EscenarioPrueba.pintar_rampa(c, Vector2i(5 + 2 * largo + 5, -1), 4, de_45, -1), Vector2(0, -1), corrimiento)
+	var llego_arriba := false
+	var resultado := false
+	Input.action_press(&"mover_derecha")
+	for i in 260:
+		await get_tree().physics_frame
+		var y := _jugador.position.y - corrimiento.y
+		if absf(y + 4 * T) < 0.5:
+			llego_arriba = true
+		if llego_arriba and absf(y) < 0.5:
+			resultado = true
+			break
+	Input.action_release(&"mover_derecha")
+	return resultado
 
 
 ## Salta quieto bajo un techo con [param alto_libre] tiles de alto libre,

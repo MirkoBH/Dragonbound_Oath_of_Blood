@@ -13,8 +13,8 @@
 [ext_resource type="Script" path="res://src/gameplay/combat/hitbox.gd" id="10_hitbox"]
 [ext_resource type="Script" path="res://src/gameplay/combat/hurtbox.gd" id="11_hurtbox"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_caja"]
-size = Vector2(12, 28)
+[sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_caja"]
+points = PackedVector2Array(-6, -14, 6, -14, 6, 11, 3, 14, -3, 14, -6, 11)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_golpes"]
 size = Vector2(12, 28)
@@ -27,7 +27,7 @@ script = ExtResource("1_player")
 
 [node name="CajaColision" type="CollisionShape2D" parent="."]
 position = Vector2(0, -14)
-shape = SubResource("RectangleShape2D_caja")
+shape = SubResource("ConvexPolygonShape2D_caja")
 
 [node name="AreaGolpes" type="Area2D" parent="."]
 script = ExtResource("11_hurtbox")
