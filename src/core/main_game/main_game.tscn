@@ -1,11 +1,20 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://src/core/main_game/main_game.gd" id="1_main"]
+[ext_resource type="Script" path="res://src/core/niveles/gestor_niveles.gd" id="2_gestor"]
+[ext_resource type="Resource" path="res://src/resources/secuencia_niveles.tres" id="3_secuencia"]
+[ext_resource type="Script" path="res://src/core/niveles/fundido.gd" id="4_fundido"]
 
 [node name="MainGame" type="Node"]
 script = ExtResource("1_main")
 
 [node name="Systems" type="Node" parent="."]
+
+[node name="GestorNiveles" type="Node" parent="Systems"]
+unique_name_in_owner = true
+process_mode = 3
+script = ExtResource("2_gestor")
+secuencia = ExtResource("3_secuencia")
 
 [node name="World" type="Node2D" parent="."]
 
@@ -58,6 +67,17 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
+
+[node name="Fundido" type="ColorRect" parent="TransitionLayer/TransitionRoot"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 1)
+script = ExtResource("4_fundido")
 
 [node name="DebugLayer" type="CanvasLayer" parent="."]
 process_mode = 3

@@ -250,6 +250,23 @@ func morir() -> bool:
 	return maquina.interrumpir(&"Morir")
 
 
+## Ubica a William en [param posicion], sin nada de la escena anterior:
+## quieto, mirando a la derecha y con el control disponible (1.4.2.1).
+## La salud y la energía pertenecen al estado de la partida (1.4.11).
+func aparecer(posicion: Vector2) -> void:
+	global_position = posicion
+	velocity = Vector2.ZERO
+	mirando = 1
+	y_despegue = position.y
+	_tiempo_desde_pedido_salto = INF
+	_tiempo_desde_suelo = 0.0
+	_margen_disponible = true
+	espada.desactivar()
+	area_golpes.activa = true
+	area_golpes.quitar_invulnerabilidad()
+	maquina.cambiar_a(&"Quieto")
+
+
 ## Nombre del estado actual.
 func obtener_estado() -> StringName:
 	return maquina.obtener_nombre_estado()
