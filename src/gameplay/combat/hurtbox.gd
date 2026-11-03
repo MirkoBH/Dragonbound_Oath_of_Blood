@@ -5,7 +5,8 @@ extends Area2D
 ## Se agrega como hijo del personaje, con su CollisionShape2D. Las Hitbox la
 ## detectan y le entregan un [Golpe]. La hurtbox solo decide si lo acepta:
 ## no lo acepta si está desactivada (por ejemplo, con la Armadura de dragón,
-## 1.4.5.10) o mientras dura la invulnerabilidad. El daño lo calcula 1.4.5.1.
+## 1.4.5.10) o mientras dura la invulnerabilidad. El daño lo calcula
+## CalculoDanio y lo descuenta Salud (1.4.5.1).
 
 ## Se emite cada vez que se acepta un golpe.
 signal golpe_recibido(golpe: Golpe)

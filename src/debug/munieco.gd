@@ -1,6 +1,7 @@
 class_name Munieco
 extends CharacterBody2D
-## Enemigo de prueba (solo depuración) para probar hitboxes y hurtboxes.
+## Enemigo de prueba (solo depuración) para probar hitboxes, hurtboxes y el
+## daño con resistencias (1.4.5.1). La base real de los enemigos es 1.4.6.1.
 ##
 ## Bloquea el paso de William, recibe golpes en su hurtbox y, si [member ataca]
 ## es true, lanza un golpe hacia William cada [member intervalo] segundos.
@@ -9,7 +10,15 @@ extends CharacterBody2D
 @export var ataca: bool = false
 @export var intervalo: float = 1.5
 @export var danio: float = 0.5
+## Salud en corazones (1.4.5.1). Con 0 o menos, no muere nunca.
+@export var salud_maxima: float = 0.0
+## Resistencias al daño (1.2.4.2, sección 4).
+@export var resistencias: Resistencias
 var objetivo: Node2D
+var salud: Salud
+var danio_recibido: float = 0.0
+var golpes_sin_efecto: int = 0
+var muerto: bool = false
 
 var golpes_recibidos: int = 0
 var ultimo_golpe: Golpe
@@ -28,6 +37,12 @@ func _ready() -> void:
 	hurtbox.add_child(_forma(Vector2(14, 28), Vector2(0, -14)))
 	add_child(hurtbox)
 	hurtbox.golpe_recibido.connect(_al_recibir_golpe)
+	if salud_maxima > 0.0:
+		salud = Salud.new()
+		salud.salud_maxima = salud_maxima
+		add_child(salud)
+		salud.golpe_sin_efecto.connect(func(_g: Golpe) -> void: golpes_sin_efecto += 1)
+		salud.murio.connect(_al_morir)
 	if ataca:
 		hitbox = Hitbox.new()
 		hitbox.perfil = CapasColision.Perfil.ATAQUE_ENEMIGO
@@ -56,6 +71,16 @@ func _al_recibir_golpe(golpe: Golpe) -> void:
 	golpes_recibidos += 1
 	ultimo_golpe = golpe
 	destello = 0.15
+	if salud:
+		danio_recibido += salud.aplicar_danio(CalculoDanio.danio_a_enemigo(golpe, resistencias), golpe)
+
+
+func _al_morir() -> void:
+	muerto = true
+	hurtbox.activa = false
+	if hitbox:
+		hitbox.desactivar()
+	ataca = false
 
 
 func _forma(tamanio: Vector2, posicion: Vector2) -> CollisionShape2D:

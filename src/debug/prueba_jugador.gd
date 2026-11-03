@@ -87,7 +87,11 @@ func _unhandled_input(evento: InputEvent) -> void:
 		return
 	match tecla.physical_keycode:
 		KEY_H:
-			_jugador.recibir_danio(_jugador.global_position.x + 16.0 * _jugador.mirando)
+			# Golpe de 1 corazón de frente (1.4.5.1): descuenta salud.
+			var golpe := Golpe.new()
+			golpe.danio = 1.0
+			golpe.origen = _jugador.global_position + Vector2(16.0 * _jugador.mirando, 0)
+			_jugador.area_golpes.recibir(golpe)
 		KEY_M:
 			_jugador.morir()
 		KEY_R:
@@ -101,13 +105,13 @@ func _process(delta: float) -> void:
 		get_tree().reload_current_scene()
 	_destello_golpe = maxf(_destello_golpe - delta, 0.0)
 	var lineas := PackedStringArray()
-	lineas.append("Estado: %s" % _jugador.obtener_estado())
+	lineas.append("Estado: %s  ·  Salud: %s / %s corazones" % [_jugador.obtener_estado(), _jugador.salud.obtener_actual(), _jugador.salud.salud_maxima])
 	lineas.append("Velocidad: (%.1f, %.1f) tiles/s  En el suelo: %s" % [_jugador.velocity.x / Jugador.TILE, _jugador.velocity.y / Jugador.TILE, "sí" if _jugador.is_on_floor() else "no"])
 	lineas.append("Último salto: %s" % _ultimo_salto)
 	lineas.append("")
 	lineas.append_array(_historial)
 	lineas.append("")
-	lineas.append("A/D mover · Espacio saltar · J atacar · H golpe · M morir · R reiniciar")
+	lineas.append("A/D mover · Espacio saltar · J atacar · H golpe de 1 corazón · M morir · R reiniciar")
 	if _muerte_terminada:
 		lineas.append("Muerte terminada: R para reiniciar.")
 	_texto.text = "\n".join(lineas)
@@ -119,6 +123,7 @@ func _draw() -> void:
 		if hijo.has_meta(&"rect"):
 			draw_rect(hijo.get_meta(&"rect"), Color("8c6a3c"))
 	var color: Color = COLORES.get(_jugador.obtener_estado(), Color.WHITE)
+	color.a = _jugador.modulate.a
 	var base := _jugador.position
 	draw_rect(Rect2(base + Vector2(-6, -28), Vector2(12, 28)), color)
 	# Marca hacia dónde mira.

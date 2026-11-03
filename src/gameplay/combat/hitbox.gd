@@ -27,6 +27,8 @@ enum Modo {
 ## Daño base en corazones.
 @export var danio: float = 1.0
 @export var tipo: Golpe.TipoDanio = Golpe.TipoDanio.FISICO
+## Daño mágico extra de cada golpe, en corazones (runa de fuego, 1.4.5.2).
+@export var danio_magico_extra: float = 0.0
 ## Si es true, empieza activa (por ejemplo, una trampa fija).
 @export var activa_al_iniciar: bool = false
 ## Quién golpea. Si queda vacío, se usa el nodo padre.
@@ -92,6 +94,7 @@ func crear_golpe() -> Golpe:
 	var golpe := Golpe.new()
 	golpe.danio = danio
 	golpe.tipo = tipo
+	golpe.danio_magico_extra = danio_magico_extra
 	golpe.origen = (fuente as Node2D).global_position if fuente is Node2D else global_position
 	golpe.fuente = fuente
 	golpe.hitbox = self

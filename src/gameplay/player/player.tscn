@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3]
+[gd_scene load_steps=17 format=3]
 
 [ext_resource type="Script" path="res://src/gameplay/player/player.gd" id="1_player"]
 [ext_resource type="Script" path="res://src/core/state_machine/maquina_estados.gd" id="2_maquina"]
@@ -12,6 +12,7 @@
 
 [ext_resource type="Script" path="res://src/gameplay/combat/hitbox.gd" id="10_hitbox"]
 [ext_resource type="Script" path="res://src/gameplay/combat/hurtbox.gd" id="11_hurtbox"]
+[ext_resource type="Script" path="res://src/gameplay/combat/salud.gd" id="12_salud"]
 
 [sub_resource type="ConvexPolygonShape2D" id="ConvexPolygonShape2D_caja"]
 points = PackedVector2Array(-6, -14, 6, -14, 6, 11, 3, 14, -3, 14, -6, 11)
@@ -44,6 +45,9 @@ perfil = 6
 
 [node name="Forma" type="CollisionShape2D" parent="Espada"]
 shape = SubResource("RectangleShape2D_espada")
+
+[node name="Salud" type="Node" parent="."]
+script = ExtResource("12_salud")
 
 [node name="MaquinaEstados" type="Node" parent="." node_paths=PackedStringArray("estado_inicial")]
 script = ExtResource("2_maquina")
