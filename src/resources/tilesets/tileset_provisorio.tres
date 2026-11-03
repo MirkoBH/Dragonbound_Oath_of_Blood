@@ -1,0 +1,42 @@
+[gd_resource type="TileSet" format=3]
+
+[ext_resource type="Texture2D" path="res://assets/art/world/tilesets/provisorio/tiles_provisorios.png" id="1_04tek"]
+
+[sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_vjb5t"]
+texture = ExtResource("1_04tek")
+0:0/0 = 0
+0:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, 8, -8, 8)
+0:0/0/custom_data_0 = 1
+1:0/0 = 0
+1:0/0/physics_layer_1/polygon_0/points = PackedVector2Array(-8, -8, 8, -8, 8, -4, -8, -4)
+1:0/0/physics_layer_1/polygon_0/one_way = true
+1:0/0/physics_layer_1/polygon_0/one_way_margin = 4.0
+1:0/0/custom_data_0 = 2
+2:0/0 = 0
+2:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, 8, 8, -8, 8, 8)
+2:0/0/custom_data_0 = 3
+3:0/0 = 0
+3:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, 8, -8, 8)
+3:0/0/custom_data_0 = 4
+4:0/0 = 0
+4:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, 8, 8, 0, 8, 8)
+4:0/0/custom_data_0 = 5
+5:0/0 = 0
+5:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, 0, 8, -8, 8, 8, -8, 8)
+5:0/0/custom_data_0 = 6
+6:0/0 = 0
+6:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, -8, 8, 0, 8, 8, -8, 8)
+6:0/0/custom_data_0 = 7
+7:0/0 = 0
+7:0/0/physics_layer_0/polygon_0/points = PackedVector2Array(-8, 0, 8, 8, -8, 8)
+7:0/0/custom_data_0 = 8
+8:0/0 = 0
+
+[resource]
+physics_layer_0/collision_layer = 1
+physics_layer_0/collision_mask = 0
+physics_layer_1/collision_layer = 2
+physics_layer_1/collision_mask = 0
+custom_data_layer_0/name = "forma"
+custom_data_layer_0/type = 2
+sources/0 = SubResource("TileSetAtlasSource_vjb5t")
