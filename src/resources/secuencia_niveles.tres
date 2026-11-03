@@ -1,0 +1,8 @@
+[gd_resource type="Resource" script_class="SecuenciaNiveles" format=3]
+
+[ext_resource type="Script" path="res://src/resources/secuencia_niveles.gd" id="1_secuencia"]
+
+[resource]
+script = ExtResource("1_secuencia")
+niveles = Array[String](["res://src/levels/nivel_01.tscn", "res://src/levels/nivel_02.tscn", "res://src/levels/nivel_03.tscn", "res://src/levels/nivel_04.tscn", "res://src/levels/nivel_05.tscn"])
+campamento = "res://src/levels/campamento.tscn"
