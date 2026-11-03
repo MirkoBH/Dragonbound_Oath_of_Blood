@@ -100,6 +100,7 @@ func _probar_enemigo() -> void:
 		await _atacar()
 	_verificar(is_equal_approx(enemigo.danio_recibido, 3.0) and enemigo.muerto, "Con 50 % de resistencia física, 6 espadazos de ½ lo derrotan (3 corazones).")
 	_verificar(muertes.size() == 1, "El enemigo avisa su muerte una sola vez.")
+	_verificar(enemigo.collision_layer == 0, "El muñeco muerto deja de bloquear el paso.")
 	await _atacar()
 	_verificar(enemigo.golpes_recibidos == 6, "Muerto, ya no recibe golpes.")
 	enemigo.queue_free()

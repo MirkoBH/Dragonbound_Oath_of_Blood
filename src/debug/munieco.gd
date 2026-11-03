@@ -75,8 +75,12 @@ func _al_recibir_golpe(golpe: Golpe) -> void:
 		danio_recibido += salud.aplicar_danio(CalculoDanio.danio_a_enemigo(golpe, resistencias), golpe)
 
 
+## Al morir deja de bloquear el paso y de recibir golpes. En los enemigos
+## reales, qué pasa con el cuerpo (animación, desaparición, botín) lo define
+## la IA de 1.4.6.1 junto con 1.4.7.
 func _al_morir() -> void:
 	muerto = true
+	collision_layer = 0
 	hurtbox.activa = false
 	if hitbox:
 		hitbox.desactivar()
