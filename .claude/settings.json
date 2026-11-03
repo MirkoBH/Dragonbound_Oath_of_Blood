@@ -4,7 +4,8 @@
     "allow": [
       "Bash(godot --version)",
       "Bash(godot --headless --import)",
-      "Bash(godot --headless res://src/debug/prueba_*.tscn)"
+      "Bash(godot --headless res://src/debug/prueba_*.tscn)",
+      "Bash(timeout 120 godot --headless res://src/debug/prueba_*.tscn)"
     ],
     "ask": [
       "Bash(git push *)",
