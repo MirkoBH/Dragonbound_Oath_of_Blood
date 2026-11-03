@@ -165,6 +165,11 @@ func _probar_caminata() -> void:
 	_verificar(_gestor.esta_en_transicion(), "Llega al disparador corriendo (%.1f s)." % (cuadros / 60.0))
 	await _esperar_fin_transicion()
 	_verificar(_escena_actual() == "Campamento", "Pasa al campamento.")
+	# La salida del nivel y la del campamento están en el mismo lugar: William
+	# no debe activarla por venir de ahí (la física retoma la posición vieja).
+	await _esperar_cuadros(120)
+	_verificar(_escena_actual() == "Campamento" and not _gestor.esta_en_transicion(), "Sin moverse, sigue en el campamento 2 s después.")
+	_verificar(_gestor.jugador.is_on_floor(), "Queda parado en el punto de aparición.")
 	_gestor.iniciar_partida()
 	await _esperar_fin_transicion()
 

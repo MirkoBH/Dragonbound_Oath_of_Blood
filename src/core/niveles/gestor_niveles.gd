@@ -23,6 +23,8 @@ signal transicion_terminada
 signal secuencia_terminada
 
 const ESCENA_WILLIAM: PackedScene = preload("res://src/gameplay/player/player.tscn")
+## Cuadros que tarda la física en actualizarse después de quitar la pausa.
+const CUADROS_SINCRONIZACION_FISICA := 2
 
 ## Orden de las escenas de la partida.
 @export var secuencia: SecuenciaNiveles
@@ -91,8 +93,18 @@ func _ir_a(paso: int) -> void:
 		escena_cambiada.emit(paso, secuencia.es_campamento(paso))
 	await _fundido.aclarar()
 	get_tree().paused = false
+	await _esperar_sincronizacion_fisica()
 	_en_transicion = false
 	transicion_terminada.emit()
+
+
+## La física no avanza durante la pausa: al quitarla, sus primeros cuadros
+## todavía ven a William donde estaba en la escena anterior. Si ahí hay un
+## disparador de la escena nueva, avisa aunque William ya no esté: por eso la
+## transición termina recién acá, y [method avanzar] ignora ese aviso.
+func _esperar_sincronizacion_fisica() -> void:
+	for _cuadro in CUADROS_SINCRONIZACION_FISICA:
+		await get_tree().physics_frame
 
 
 ## Crea la escena de [param paso]. Devuelve null, con el error en la consola,
