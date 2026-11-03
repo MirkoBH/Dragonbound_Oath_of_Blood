@@ -101,6 +101,15 @@ func _probar_enemigo() -> void:
 	_verificar(is_equal_approx(enemigo.danio_recibido, 3.0) and enemigo.muerto, "Con 50 % de resistencia física, 6 espadazos de ½ lo derrotan (3 corazones).")
 	_verificar(muertes.size() == 1, "El enemigo avisa su muerte una sola vez.")
 	_verificar(enemigo.collision_layer == 0, "El muñeco muerto deja de bloquear el paso.")
+	var x_muerto := enemigo.position.x
+	Input.action_press(&"mover_derecha")
+	await _esperar(40)
+	Input.action_release(&"mover_derecha")
+	_verificar(jugador.position.x > enemigo.position.x + 10.0, "William lo atraviesa caminando.")
+	_verificar(is_equal_approx(enemigo.position.x, x_muerto), "El muñeco muerto no se mueve cuando William pasa.")
+	jugador.position = Vector2(0, -1)
+	jugador.mirando = 1
+	await _esperar(5)
 	await _atacar()
 	_verificar(enemigo.golpes_recibidos == 6, "Muerto, ya no recibe golpes.")
 	enemigo.queue_free()

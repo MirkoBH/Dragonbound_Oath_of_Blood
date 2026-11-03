@@ -80,7 +80,9 @@ func _al_recibir_golpe(golpe: Golpe) -> void:
 ## la IA de 1.4.6.1 junto con 1.4.7.
 func _al_morir() -> void:
 	muerto = true
+	# Ni bloquea a William ni lo detecta: solo sigue apoyado en el terreno.
 	collision_layer = 0
+	collision_mask = CapasColision.BIT_TERRENO | CapasColision.BIT_PLATAFORMAS
 	hurtbox.activa = false
 	if hitbox:
 		hitbox.desactivar()
