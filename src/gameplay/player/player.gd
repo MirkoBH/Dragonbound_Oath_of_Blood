@@ -10,6 +10,11 @@ extends CharacterBody2D
 ## altura variable, gravedad simétrica, margen al borde y memoria del salto.
 ## Los valores están en [member metricas] (src/resources/metricas_william.tres).
 ## Las animaciones de cada estado se conectan en 1.4.10.
+##
+## Daño (1.4.5.1): cada golpe aceptado por la hurtbox se calcula con
+## CalculoDanio (talismanes de [member protecciones]) y se descuenta de la
+## [Salud]. Después, retroceso, invulnerabilidad de 1 s con parpadeo y, si la
+## salud llega a 0, el estado Morir y el aviso [signal murio].
 
 ## Cambio de estado, para la animación (1.4.10) y la depuración.
 signal estado_cambiado(anterior: StringName, nuevo: StringName)
@@ -18,9 +23,12 @@ signal estado_cambiado(anterior: StringName, nuevo: StringName)
 signal golpe_activado
 ## Terminó la animación de muerte: la partida puede reiniciarse (1.4.11.3).
 signal muerte_terminada
-## William aceptó un golpe (ya aplicó el retroceso y la invulnerabilidad).
-## 1.4.5.1 lo usa para descontar la salud.
+## William recibió un golpe: ya se descontó la salud y se aplicaron el
+## retroceso y la invulnerabilidad (el daño aplicado lo avisa salud.danio_recibido).
 signal golpe_recibido(golpe: Golpe)
+## La salud llegó a 0: aviso de muerte, apenas ocurre (1.4.11.3 reinicia la
+## aventura cuando termina la animación, con [signal muerte_terminada]).
+signal murio
 
 const TILE := 16.0
 
@@ -44,6 +52,10 @@ const TILE := 16.0
 @export var ventana_golpe: float = 0.1
 ## Daño base de la espada, en corazones (1.2.4.2). Las mejoras las suma 1.4.5.2.
 @export var danio_espada: float = 1.0
+## Parpadeo durante la invulnerabilidad: medio ciclo, en segundos (1.2.4.2).
+@export var intervalo_parpadeo: float = 0.08
+## Talismanes de William. PROVISORIO hasta el estado global (1.4.11.1).
+@export var protecciones: ProteccionesJugador
 
 ## Lado hacia el que mira William: 1 derecha, -1 izquierda.
 var mirando: int = 1
@@ -53,6 +65,8 @@ var mirando: int = 1
 @onready var espada: Hitbox = $Espada
 ## Área donde William recibe golpes: 12 × 28 px (1.2.5.1, 6.2).
 @onready var area_golpes: Hurtbox = $AreaGolpes
+## Salud en corazones: 5 al empezar (1.2.4.1).
+@onready var salud: Salud = $Salud
 
 var _desplazamiento_espada: float = 0.0
 ## Segundos desde que se presionó Espacio (memoria del salto).
@@ -72,6 +86,9 @@ func _ready() -> void:
 	espada.danio = danio_espada
 	golpe_activado.connect(_activar_espada)
 	area_golpes.golpe_recibido.connect(_al_recibir_golpe)
+	salud.murio.connect(_al_morir)
+	if protecciones == null:
+		protecciones = ProteccionesJugador.new()
 	maquina.estado_cambiado.connect(func(anterior: StringName, nuevo: StringName) -> void:
 		estado_cambiado.emit(anterior, nuevo))
 	maquina.iniciar(self)
@@ -229,18 +246,39 @@ func _activar_espada() -> void:
 	espada.activar(ventana_golpe)
 
 
-## La hurtbox aceptó un golpe: retroceso e invulnerabilidad breve.
+## La hurtbox aceptó un golpe (1.2.4.2, sección 8.2): calcula el daño con
+## los talismanes, lo descuenta y aplica la invulnerabilidad. Si William sigue
+## vivo, además lo hace retroceder.
 func _al_recibir_golpe(golpe: Golpe) -> void:
-	if recibir_danio(golpe.origen.x):
-		area_golpes.aplicar_invulnerabilidad(duracion_invulnerabilidad)
-		golpe_recibido.emit(golpe)
+	var danio := CalculoDanio.danio_a_william(golpe, protecciones)
+	salud.aplicar_danio(danio, golpe)
+	area_golpes.aplicar_invulnerabilidad(duracion_invulnerabilidad)
+	if not salud.esta_muerto():
+		recibir_danio(golpe.origen.x)
+	golpe_recibido.emit(golpe)
+
+
+func _al_morir() -> void:
+	morir()
+	murio.emit()
+
+
+func _process(_delta: float) -> void:
+	# Parpadeo mientras dura la invulnerabilidad. Usa la transparencia del
+	# personaje entero, así funciona con cualquier sprite (1.4.10).
+	if area_golpes.esta_invulnerable() and not salud.esta_muerto():
+		var ciclo := fmod(area_golpes.obtener_invulnerabilidad_restante(), intervalo_parpadeo * 2.0)
+		modulate.a = 0.3 if ciclo < intervalo_parpadeo else 1.0
+	else:
+		modulate.a = 1.0
 
 
 # --- Eventos externos ---
 
 ## William recibe un golpe desde la posición horizontal [param origen_x].
-## Devuelve false si no se aplicó (por ejemplo, si está muriendo).
-## La salud y la invulnerabilidad las maneja 1.4.5.1.
+## Solo hace el retroceso; la salud y la invulnerabilidad las maneja
+## [method _al_recibir_golpe]. Devuelve false si no se aplicó (por ejemplo,
+## si está muriendo).
 func recibir_danio(origen_x: float) -> bool:
 	return maquina.interrumpir(&"RecibirDanio", {"origen_x": origen_x})
 
