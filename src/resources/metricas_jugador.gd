@@ -37,6 +37,17 @@ const TILE := 16.0
 ## Memoria del salto: un Espacio presionado hasta este tiempo antes de tocar
 ## el suelo se ejecuta al aterrizar.
 @export var memoria_salto: float = 0.1
+## Corrección de esquinas, en px: si William choca la cabeza con el borde de
+## un techo por esta distancia o menos, se lo corre de costado y sigue subiendo.
+@export var correccion_esquinas: float = 4.0
+
+@export_group("Colisión (1.4.3.3)")
+## Pendiente máxima que cuenta como suelo, en grados. Las rampas son de 45° y
+## de 22,5° (26,6°: 1 tile en 2); una pared es más empinada que esto.
+@export var angulo_max_suelo: float = 46.0
+## Distancia, en px, a la que William se pega al suelo al bajar una rampa o al
+## pasar de rampa a llano, para no despegarse ni saltar sin querer.
+@export var pegado_al_suelo: float = 6.0
 
 
 # --- Valores en píxeles ---

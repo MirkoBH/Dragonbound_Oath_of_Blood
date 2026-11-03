@@ -67,6 +67,7 @@ var y_despegue: float = 0.0
 
 func _ready() -> void:
 	CapasColision.configurar(self, CapasColision.Perfil.CUERPO_WILLIAM)
+	_configurar_suelo()
 	_desplazamiento_espada = absf(espada.position.x)
 	espada.danio = danio_espada
 	golpe_activado.connect(_activar_espada)
@@ -82,12 +83,52 @@ func _physics_process(delta: float) -> void:
 	else:
 		_tiempo_desde_pedido_salto += delta
 	maquina.actualizar_fisica(delta)
+	_corregir_esquinas(delta)
 	move_and_slide()
+	if is_on_ceiling() and velocity.y < 0.0:
+		velocity.y = 0.0
 	if is_on_floor():
 		_tiempo_desde_suelo = 0.0
 		_margen_disponible = true
 	else:
 		_tiempo_desde_suelo += delta
+
+
+# --- Colisión con terreno y plataformas (1.4.3.3) ---
+
+## Configura cómo William pisa el suelo: rampas de hasta 45° cuentan como
+## suelo, se queda quieto sobre ellas sin resbalar y se pega al suelo al bajar.
+func _configurar_suelo() -> void:
+	up_direction = Vector2.UP
+	motion_mode = CharacterBody2D.MOTION_MODE_GROUNDED
+	floor_max_angle = deg_to_rad(metricas.angulo_max_suelo)
+	floor_snap_length = metricas.pegado_al_suelo
+	floor_stop_on_slope = true
+	floor_block_on_wall = true
+	floor_constant_speed = true
+
+
+## Corrección de esquinas: si al subir la cabeza va a chocar con el borde de
+## un techo, busca un desplazamiento lateral de hasta
+## [member MetricasJugador.correccion_esquinas] px que lo libere y lo aplica.
+## Prueba primero hacia donde se mueve William. Busca hasta 1 px más que el
+## roce permitido, porque Godot deja un margen de seguridad (safe_margin)
+## entre el cuerpo y el terreno.
+func _corregir_esquinas(delta: float) -> void:
+	if velocity.y >= 0.0:
+		return
+	var paso := Vector2(0.0, velocity.y * delta)
+	if not test_move(global_transform, paso):
+		return
+	var primero := 1.0 if velocity.x >= 0.0 else -1.0
+	for distancia in range(1, int(metricas.correccion_esquinas) + 2):
+		for lado: float in [primero, -primero]:
+			var corrimiento := Vector2(lado * distancia, 0.0)
+			if test_move(global_transform, corrimiento):
+				continue
+			if not test_move(global_transform.translated(corrimiento), paso):
+				global_position += corrimiento
+				return
 
 
 # --- Valores derivados ---

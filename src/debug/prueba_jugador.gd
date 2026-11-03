@@ -34,15 +34,7 @@ var _ultimo_salto: String = "—"
 
 func _ready() -> void:
 	RenderingServer.set_default_clear_color(Color("1b1424"))
-	# Piso con un pozo de 4 tiles, plataformas a 1 y 3 tiles, una más alta
-	# (no alcanzable de un salto) y paredes en los extremos.
-	EscenarioPrueba.crear_terreno(self, Rect2(-320, 0, 800, 32))
-	EscenarioPrueba.crear_terreno(self, Rect2(544, 0, 600, 32))
-	EscenarioPrueba.crear_terreno(self, Rect2(-160, -16, 64, 16))
-	EscenarioPrueba.crear_terreno(self, Rect2(96, -48, 96, 8))
-	EscenarioPrueba.crear_terreno(self, Rect2(256, -96, 96, 8))
-	EscenarioPrueba.crear_terreno(self, Rect2(-320, -200, 16, 200))
-	EscenarioPrueba.crear_terreno(self, Rect2(1128, -200, 16, 200))
+	_armar_escenario()
 
 	_jugador = preload("res://src/gameplay/player/player.tscn").instantiate()
 	_jugador.position = Vector2(0, -1)
@@ -60,6 +52,19 @@ func _ready() -> void:
 	_texto.position = Vector2(8, 8)
 	_texto.add_theme_font_size_override(&"font_size", 8)
 	capa.add_child(_texto)
+
+
+## Arma el escenario. prueba_terreno.gd la reemplaza por un tilemap.
+func _armar_escenario() -> void:
+	# Piso con un pozo de 4 tiles, plataformas a 1 y 3 tiles, una más alta
+	# (no alcanzable de un salto) y paredes en los extremos.
+	EscenarioPrueba.crear_terreno(self, Rect2(-320, 0, 800, 32))
+	EscenarioPrueba.crear_terreno(self, Rect2(544, 0, 600, 32))
+	EscenarioPrueba.crear_terreno(self, Rect2(-160, -16, 64, 16))
+	EscenarioPrueba.crear_terreno(self, Rect2(96, -48, 96, 8))
+	EscenarioPrueba.crear_terreno(self, Rect2(256, -96, 96, 8))
+	EscenarioPrueba.crear_terreno(self, Rect2(-320, -200, 16, 200))
+	EscenarioPrueba.crear_terreno(self, Rect2(1128, -200, 16, 200))
 
 
 func _al_cambiar_estado(anterior: StringName, nuevo: StringName) -> void:
