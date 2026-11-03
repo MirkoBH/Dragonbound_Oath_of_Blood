@@ -43,6 +43,11 @@ func aplicar_invulnerabilidad(segundos: float) -> void:
 	_invulnerable_restante = maxf(_invulnerable_restante, segundos)
 
 
+## Termina la invulnerabilidad en curso (William al aparecer, 1.4.2.1).
+func quitar_invulnerabilidad() -> void:
+	_invulnerable_restante = 0.0
+
+
 ## Indica si está en período de invulnerabilidad.
 func esta_invulnerable() -> bool:
 	return _invulnerable_restante > 0.0

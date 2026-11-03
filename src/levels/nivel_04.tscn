@@ -1,0 +1,35 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://src/levels/nivel_provisorio.gd" id="1_nivel"]
+[ext_resource type="Script" path="res://src/levels/disparador_fin_nivel.gd" id="2_disparador"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_salida"]
+size = Vector2(16, 80)
+
+[node name="Nivel04" type="Node2D" node_paths=PackedStringArray("punto_aparicion", "disparador_fin")]
+script = ExtResource("1_nivel")
+punto_aparicion = NodePath("LevelObjects/PuntoAparicion")
+disparador_fin = NodePath("LevelObjects/DisparadorFin")
+etiqueta = "Nivel 4 (provisorio)"
+
+[node name="Background" type="Node2D" parent="."]
+
+[node name="Tilemaps" type="Node2D" parent="."]
+
+[node name="Ground" type="TileMapLayer" parent="Tilemaps"]
+
+[node name="LevelObjects" type="Node2D" parent="."]
+
+[node name="PuntoAparicion" type="Marker2D" parent="LevelObjects"]
+position = Vector2(48, 320)
+
+[node name="DisparadorFin" type="Area2D" parent="LevelObjects"]
+position = Vector2(616, 280)
+script = ExtResource("2_disparador")
+
+[node name="Forma" type="CollisionShape2D" parent="LevelObjects/DisparadorFin"]
+shape = SubResource("RectangleShape2D_salida")
+
+[node name="Environment" type="Node" parent="."]
+
+[node name="CanvasModulate" type="CanvasModulate" parent="Environment"]
