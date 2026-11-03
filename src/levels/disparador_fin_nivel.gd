@@ -14,6 +14,17 @@ func _ready() -> void:
 	body_entered.connect(_al_entrar_cuerpo)
 
 
+## Rectángulo que ocupa, relativo al disparador. Usa su CollisionShape2D.
+func obtener_rectangulo() -> Rect2:
+	for hijo in get_children():
+		var forma := hijo as CollisionShape2D
+		if forma != null and forma.shape != null:
+			var rectangulo := forma.shape.get_rect()
+			rectangulo.position += forma.position
+			return rectangulo
+	return Rect2()
+
+
 func _al_entrar_cuerpo(cuerpo: Node2D) -> void:
 	var william := cuerpo as Jugador
 	if william != null and william.obtener_estado() != &"Morir":

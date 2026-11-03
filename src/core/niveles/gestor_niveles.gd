@@ -23,8 +23,6 @@ signal transicion_terminada
 signal secuencia_terminada
 
 const ESCENA_WILLIAM: PackedScene = preload("res://src/gameplay/player/player.tscn")
-## Cuadros que tarda la física en actualizarse después de quitar la pausa.
-const CUADROS_SINCRONIZACION_FISICA := 2
 
 ## Orden de las escenas de la partida.
 @export var secuencia: SecuenciaNiveles
@@ -87,24 +85,35 @@ func _ir_a(paso: int) -> void:
 	await _fundido.oscurecer()
 	var nivel := _cargar(paso)
 	if nivel != null:
-		_reemplazar_nivel(nivel)
+		_descargar_nivel_actual()
+		var posicion := _raiz_nivel.global_transform * nivel.obtener_posicion_aparicion()
+		jugador.aparecer(posicion)
+		await _esperar_posicion_en_fisica(posicion)
+		_colocar_nivel(nivel)
 		_paso = paso
-		jugador.aparecer(nivel.punto_aparicion.global_position)
 		escena_cambiada.emit(paso, secuencia.es_campamento(paso))
 	await _fundido.aclarar()
 	get_tree().paused = false
-	await _esperar_sincronizacion_fisica()
 	_en_transicion = false
 	transicion_terminada.emit()
 
 
-## La física no avanza durante la pausa: al quitarla, sus primeros cuadros
-## todavía ven a William donde estaba en la escena anterior. Si ahí hay un
-## disparador de la escena nueva, avisa aunque William ya no esté: por eso la
-## transición termina recién acá, y [method avanzar] ignora ese aviso.
-func _esperar_sincronizacion_fisica() -> void:
-	for _cuadro in CUADROS_SINCRONIZACION_FISICA:
+## Espera a que el servidor de física tenga a William en [param posicion].
+## Un cuerpo como William recién cambia de lugar en el servidor al avanzar la
+## física, que está detenida por la pausa. Si la escena nueva entrara antes,
+## sus áreas lo detectarían donde estaba en la escena anterior. Se activa la
+## física solo durante esta espera: el resto del juego sigue en pausa y no hay
+## ningún nivel cargado.
+func _esperar_posicion_en_fisica(posicion: Vector2) -> void:
+	PhysicsServer2D.set_active(true)
+	while not _posicion_en_fisica().is_equal_approx(posicion):
 		await get_tree().physics_frame
+	PhysicsServer2D.set_active(false)
+
+
+func _posicion_en_fisica() -> Vector2:
+	var estado: Transform2D = PhysicsServer2D.body_get_state(jugador.get_rid(), PhysicsServer2D.BODY_STATE_TRANSFORM)
+	return estado.origin
 
 
 ## Crea la escena de [param paso]. Devuelve null, con el error en la consola,
@@ -127,10 +136,14 @@ func _cargar(paso: int) -> Nivel:
 	return nivel
 
 
-func _reemplazar_nivel(nivel: Nivel) -> void:
+func _descargar_nivel_actual() -> void:
 	if _nivel_actual != null:
 		_raiz_nivel.remove_child(_nivel_actual)
 		_nivel_actual.queue_free()
+
+
+func _colocar_nivel(nivel: Nivel) -> void:
 	_nivel_actual = nivel
+	nivel.jugador = jugador
 	_raiz_nivel.add_child(nivel)
 	nivel.fin_alcanzado.connect(avanzar)

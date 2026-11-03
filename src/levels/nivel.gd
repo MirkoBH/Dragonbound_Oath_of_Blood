@@ -14,10 +14,19 @@ signal fin_alcanzado
 ## Disparador de fin de nivel. Se deja vacío en el nivel 5.
 @export var disparador_fin: DisparadorFinNivel
 
+## William. Lo asigna el gestor de niveles antes de agregar la escena.
+var jugador: Jugador
+
 
 func _ready() -> void:
 	if disparador_fin != null:
 		disparador_fin.william_llego.connect(fin_alcanzado.emit)
+
+
+## Punto de aparición relativo a esta escena. Sirve antes de agregarla al
+## árbol, cuando todavía no tiene posición global.
+func obtener_posicion_aparicion() -> Vector2:
+	return (transform * punto_aparicion.get_relative_transform_to_parent(self)).origin
 
 
 ## Devuelve la lista de errores, vacía si la escena está bien.
